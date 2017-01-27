@@ -66,30 +66,19 @@ module GoodData
         c, project = GoodData.get_client_and_project(options)
 
         fail 'Process ID has to be provided' if process_id.blank?
-
-        is_dataload_process = Process[process_id, project: project].type == :dataload
-        if is_dataload_process
-          [:dataload_datasets, :de_synchronize_all].each { |param| fail "#{param} has to be provided" unless options[param] }
-        else
-          fail 'Executable has to be provided' if executable.blank?
-        end
+        fail 'Executable has to be provided' if executable.blank?
         fail 'Trigger schedule has to be provided' if trigger.blank?
 
         schedule = c.create(GoodData::Schedule, GoodData::Helpers.deep_stringify_keys(GoodData::Helpers.deep_dup(SCHEDULE_TEMPLATE)), client: c, project: project)
-
-        params = { 'PROCESS_ID' => process_id }
-        if is_dataload_process
-          params['GDC_DATALOAD_DATASETS'] = options[:dataload_datasets]
-          params['GDC_DE_SYNCHRONIZE_ALL'] = options[:de_synchronize_all]
-        else
-          params['EXECUTABLE'] = executable
-        end
 
         default_opts = {
           :type => 'MSETL',
           :timezone => 'UTC',
           :state => 'ENABLED',
-          :params => params,
+          :params => {
+            'PROCESS_ID' => process_id,
+            'EXECUTABLE' => executable
+          },
           # :reschedule => nil
         }
 

@@ -11,19 +11,6 @@ module GoodData
     class << self
       CREATE_URL = '/gdc/datawarehouse/instances'
 
-      def [](id = :all)
-        if id == :all
-          data = client.get CREATE_URL
-          data['instances']['items'].map { |ads_data| client.create(DataWarehouse, ads_data) }
-        else
-          client.create(DataWarehouse, client.get("#{CREATE_URL}/#{id}"))
-        end
-      end
-
-      def all
-        DataWarehouse[:all]
-      end
-
       # Create a data warehouse from given attributes
       # Expected keys:
       # - :title (mandatory)
@@ -49,8 +36,6 @@ module GoodData
             'authorizationToken' => auth_token
           }
         }
-        json['instance']['environment'] = opts[:environment] if opts[:environment]
-
         # do the first post
         res = c.post(CREATE_URL, json)
 
@@ -103,9 +88,5 @@ module GoodData
     # project has.
     alias_method :state, :status
     alias_method :description, :summary
-
-    def schemas
-      json['instance']['links']['schemas']
-    end
   end
 end
