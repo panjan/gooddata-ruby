@@ -45,6 +45,7 @@ module GoodData
               to_project = client.projects(pid) || fail("Invalid 'to' project specified - '#{pid}'")
 
               params.gdc_logger.info "Updating from Blueprint, project: '#{to_project.title}', PID: #{pid}"
+              params.gdc_logger.info "Blueprint data: #{blueprint.data}"
               to_project.update_from_blueprint(blueprint, update_preference: params.update_preference)
 
               results << {
