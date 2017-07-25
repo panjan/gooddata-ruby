@@ -75,14 +75,20 @@ module GoodData
 
           clients = []
           data_source = GoodData::Helpers::DataSource.new(params.input_source)
+          require 'pry'
+          binding.pry
           input_data = File.open(data_source.realize(params), 'r:UTF-8')
+          require 'pry'
+          binding.pry
           GoodData.logger.debug("Input data: #{input_data.read}")
           GoodData.logger.debug("Segment names: #{segment_names}")
           CSV.foreach(input_data, :headers => true, :return_headers => false, encoding: 'utf-8') do |row|
+          require 'pry'
+          binding.pry
             GoodData.logger.debug("Processing row: #{row}")
             segment_name = row[segment_id_column]
             GoodData.logger.debug("Segment name: #{segment_name}")
-            if segment_names.nil? || segment_names.include?(segment_name)
+            if segment_names.nil? || segment_names.empty? || segment_names.include?(segment_name)
               clients << {
                 id: row[client_id_column],
                 segment: segment_name,

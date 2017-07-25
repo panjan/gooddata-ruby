@@ -102,6 +102,8 @@ module GoodData
       end
 
       def realize_s3(params)
+    require 'pry'
+    binding.pry
         params = GoodData::Helpers.stringify_keys(params)
         s3_client = params['aws_client'] && params['aws_client']['s3_client']
         raise 'AWS client not present. Perhaps S3Middleware is missing in the brick definition?' if !s3_client || !s3_client.respond_to?(:bucket)
