@@ -282,6 +282,7 @@ module GoodData
 
       def transfer_user_groups(from_project, to_project)
         from_project.user_groups.each do |ug|
+          puts "Migrating user group #{ug.name}."
           # migrate groups
           new_group = to_project.user_groups.select { |group| group.name == ug.name }.first
           new_group ||= UserGroup.create(:name => ug.name, :description => ug.description, :project => to_project)

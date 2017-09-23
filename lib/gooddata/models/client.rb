@@ -40,7 +40,7 @@ module GoodData
 
         if id == :all
           tenants_uri = domain.segments_uri + "/clients?segment=#{CGI.escape(segment.segment_id)}"
-          Enumerator.new do |y|
+          unfiltered = Enumerator.new do |y|
             loop do
               res = client.get tenants_uri
               res['clients']['paging']['next']
@@ -53,6 +53,12 @@ module GoodData
               url = res['clients']['paging']['next']
               break unless url
             end
+          end
+
+          if $CLIENTS_FILTER
+            unfiltered.select { |u| $CLIENTS_FILTER.include?(u.id) }
+          else
+            unfiltered
           end
         else
           id = id.respond_to?(:client_id) ? id.client_id : id

@@ -304,7 +304,12 @@ to new properties (email=#{user_data[:email]}, sso_provider=#{user_data[:sso_pro
       res = client.get(clients_uri)
       res_clients = (res['clients'] && res['clients']['items']) || []
       if id == :all
-        res_clients.map { |res_client| client.create(GoodData::Client, res_client) }
+        unfiltered = res_clients.map { |res_client| client.create(GoodData::Client, res_client) }
+        if $CLIENTS_FILTER
+          unfiltered.select { |u| $CLIENTS_FILTER.include?(u.id) }
+        else
+          unfiltered
+        end
       else
         find_result = res_clients.find { |c| c['client']['id'] == id }
         fail "Client with id #{id} was not found" unless find_result

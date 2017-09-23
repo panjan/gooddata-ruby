@@ -80,6 +80,7 @@ module GoodData
           bp = segment.master_project.blueprint
           segment.clients.each do |c|
             p = c.project
+            puts "Migrating blueprint to #{c.id}."
             p.update_from_blueprint(bp, bp_opts)
           end
 
@@ -107,8 +108,10 @@ module GoodData
           # copy processes
           deployment_client_segment_master = deployment_client.projects(segment_master.pid)
           deployment_client_project = deployment_client.projects(project.pid)
+          puts "Migrating processes to #{c.id}."
           GoodData::Project.transfer_processes(deployment_client_segment_master, deployment_client_project)
 
+          puts "Migrating schedules to #{c.id}."
           GoodData::Project.transfer_schedules(segment_master, project)
 
           # Set up unique parameters
@@ -124,6 +127,7 @@ module GoodData
 
           # Transfer label types
           begin
+            puts "Migrating label types to #{c.id}."
             GoodData::LCM.transfer_label_types(segment_master, project)
           rescue => e
             puts "Unable to transfer label_types, reason: #{e.message}"
@@ -131,6 +135,7 @@ module GoodData
 
           # Transfer tagged objects
           # FIXME: Make sure it is not duplicate functionality mentioned in TMA-171
+          puts "Migrating tagged objects to #{c.id}."
           tag = migration_spec[:production_tag]
           GoodData::Project.transfer_tagged_stuff(segment_master, project, tag) if tag
         end
@@ -153,6 +158,7 @@ module GoodData
           segment = c.segment
           segment_master = segment.master_project
           project = c.project
+          puts "Migrating user groups to #{c.id}."
           GoodData::Project.transfer_user_groups(segment_master, project)
         end
       end
