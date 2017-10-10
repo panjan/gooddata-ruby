@@ -20,7 +20,6 @@ SimpleCov.start do
   add_group 'LCM', 'lib/gooddata/lcm'
 end
 
-require 'pmap'
 require 'rspec'
 require 'pathname'
 require 'webmock/rspec'
