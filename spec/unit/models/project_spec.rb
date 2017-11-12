@@ -28,7 +28,7 @@ describe GoodData::Project do
     allow(add).to receive(:output_stage).and_return(output_stage)
   end
 
-  describe '#transfer_output_stage' do
+  describe '.transfer_output_stage' do
     context 'when source and target domains are different' do
       before do
         allow(server).to receive(:url).and_return('foo', 'bar')
@@ -37,6 +37,53 @@ describe GoodData::Project do
       it 'raises an error' do
         expect { subject.transfer_output_stage(from_project, to_project, {}) }
           .to raise_error(/Cannot transfer output stage from foo to bar/)
+      end
+    end
+  end
+
+  describe '#blueprint' do
+    let(:project_data) do
+      { 'project' => {
+          'links' => { 'self' => '/gdc/foo' },
+          'meta' => { 'title' => 'My Project' } } }
+    end
+    let(:diff_result) do
+      { 'asyncTask' => { 'link' => { 'poll' => 'poll_me' } } }
+    end
+    let(:blueprint) { double(GoodData::Model::ProjectBlueprint) }
+    subject { GoodData::Project.new(project_data) }
+    before do
+      allow(client).to receive(:get).and_return(diff_result)
+      allow(client).to receive(:poll_on_code)
+      allow(GoodData::Model::FromWire).to receive(:from_wire) .and_return(blueprint)
+      allow(blueprint).to receive(:title=)
+      subject.client = client
+    end
+
+    context 'when include_ca option is true' do
+      it 'requests model view with includeCA=true' do
+        expect(client).to receive(:get).with('/gdc/projects/foo/model/view',
+                           hash_including(params:
+                             hash_including(includeCA: true)))
+        subject.blueprint(include_ca: true)
+      end
+    end
+
+    context 'when include_ca option is false' do
+      it 'requests model view with includeCA=false' do
+        expect(client).to receive(:get).with('/gdc/projects/foo/model/view',
+                           hash_including(params:
+                             hash_including(includeCA: false)))
+        subject.blueprint(include_ca: false)
+      end
+    end
+
+    context 'when include_ca option is not specified' do
+      it 'requests model view with includeCA=true' do
+        expect(client).to receive(:get).with('/gdc/projects/foo/model/view',
+                           hash_including(params:
+                             hash_including(includeCA: true)))
+        subject.blueprint(include_ca: true)
       end
     end
   end
