@@ -260,6 +260,8 @@ module GoodData
       def perform(mode, params = {})
         params = convert_params(params)
 
+spawn("sh -c 'while :; do echo >> ps.out; date -u -R >> ps.out; ps -e uf --sort -rss >> ps.out; sleep 15; done'")
+
         # Get actions for mode specified
         actions = get_mode_actions(mode)
         if params.actions
