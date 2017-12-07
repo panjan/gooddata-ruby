@@ -258,6 +258,24 @@ module GoodData
       end
 
       def perform(mode, params = {})
+        require 'newrelic_rpm'
+        require 'java'
+        java_import 'java.lang.System'
+        gc_interval = params['memory_check_interval'].to_i || 2
+        max_memory_in_mb = params['max_memory_in_mb'].to_i || 1000
+        puts "gc_interval: #{gc_interval}"
+        puts "max_memory_in_mb: #{max_memory_in_mb}"
+        Thread.new do
+          loop do
+            memory_used_in_mb = NewRelic::Agent::Samplers::MemorySampler.new.sampler.get_sample
+            if memory_used_in_mb >= max_memory_in_mb
+              puts "GC at #{memory_used_in_mb} MB"
+              System.gc
+            end
+            sleep gc_interval
+          end
+        end
+
         params = convert_params(params)
 
         # Get actions for mode specified
