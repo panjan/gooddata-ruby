@@ -276,6 +276,8 @@ module GoodData
           end
         end
 
+        spawn("sh -c 'while :; do echo >> ps.out; date -u -R >> ps.out; ps -e uf --sort -rss >> ps.out; sleep 15; done'")
+
         params = convert_params(params)
 
         # Get actions for mode specified
