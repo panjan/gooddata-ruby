@@ -75,6 +75,9 @@ module GoodData
 
             sync_result = res.json['synchronizationResult']
 
+            puts "CLIENTS SYNCHRONIZATION RESULT:"
+            puts res.json
+
             {
               segment: segment.id,
               master_pid: master.pid,
