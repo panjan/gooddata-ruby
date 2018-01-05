@@ -78,7 +78,7 @@ module GoodData
                 params.gdc_logger.info("Finished updating blueprint: #{polling_uri}")
               end
             end
-            info
+            synchronize << info
           end
 
           {
