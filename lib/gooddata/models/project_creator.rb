@@ -25,13 +25,13 @@ module GoodData
 
           project = opts[:project] || client.create_project(opts.merge(:title => opts[:title] || spec[:title], :client => client, :environment => opts[:environment]))
 
-          to_poll = migrate_datasets_async(spec, opts.merge(project: project, client: client))
+          to_poll, maqls = migrate_datasets_async(spec, opts.merge(project: project, client: client))
           load(p, spec)
           migrate_metrics(p, spec[:metrics] || [])
           migrate_reports(p, spec[:reports] || [])
           migrate_dashboards(p, spec[:dashboards] || [])
           execute_tests(p, spec[:assert_tests] || [])
-          to_poll
+          [to_poll, opts[:execute_ca_scripts] ? project : maqls.find { |maql| maql.key?('maqlDdlChunks') }]
         end
 
         def migrate(opts = {})
@@ -157,7 +157,7 @@ module GoodData
               fail "Unable to migrate LDM, reason(s): \n #{messages.join("\n")}"
             end
           end
-          to_poll
+          [to_poll, replaced_maqls + (ca_maql ? [ca_maql] : [])]
         end
 
         def migrate_reports(project, spec)

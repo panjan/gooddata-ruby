@@ -41,8 +41,7 @@ module GoodData
           client = params.gdc_gd_client
           development_client = params.development_client
 
-          synchronize = []
-          params.synchronize.map do |info|
+          synchronize = params.synchronize.map do |info|
             to_poll = []
             from_project = info.from
             to_projects = info.to
@@ -57,8 +56,10 @@ module GoodData
                 to_project = client.projects(pid) || fail("Invalid 'to' project specified - '#{pid}'")
 
                 params.gdc_logger.info "Updating from Blueprint, project: '#{to_project.title}', PID: #{pid}"
-                polling_addresses = to_project.update_from_blueprint_async(blueprint, update_preference: params.update_preference, execute_ca_scripts: false)
+                polling_addresses, ca_scripts = to_project.update_from_blueprint_async(blueprint, update_preference: params.update_preference, execute_ca_scripts: false)
                 to_poll.concat(polling_addresses)
+
+                entry[:ca_scripts] = ca_scripts
 
                 results << {
                   from: from_project,
@@ -78,7 +79,8 @@ module GoodData
                 params.gdc_logger.info("Finished updating blueprint: #{polling_uri}")
               end
             end
-            synchronize << info
+
+            info
           end
 
           {
