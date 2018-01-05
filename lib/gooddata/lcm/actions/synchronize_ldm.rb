@@ -43,7 +43,7 @@ module GoodData
 
           synchronize = []
           params.synchronize.each_slice(100) do |slice|
-            synchronize_result = slice.synchronize.map do |info|
+            synchronize_result = slice.map do |info|
               from_project = info.from
               to_projects = info.to
 
