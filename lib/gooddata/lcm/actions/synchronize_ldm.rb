@@ -43,6 +43,7 @@ module GoodData
 
           synchronize = []
           params.synchronize.each_slice(100) do |slice|
+            to_poll = []
             synchronize_result = slice.map do |info|
               from_project = info.from
               to_projects = info.to
@@ -51,7 +52,6 @@ module GoodData
               params.gdc_logger.info "Creating Blueprint, project: '#{from.title}', PID: #{from.pid}"
 
               blueprint = from.blueprint(include_ca: include_ca)
-              to_poll = []
               info[:to] = to_projects.pmap do |entry|
                 pid = entry[:pid]
                 to_project = client.projects(pid) || fail("Invalid 'to' project specified - '#{pid}'")
