@@ -72,7 +72,7 @@ module GoodData
             end
 
             to_poll.each do |polling_uri|
-              result = client.poll_on_response(polling_uri, options) do |body|
+              result = client.poll_on_response(polling_uri) do |body|
                 body && body['wTaskStatus'] && body['wTaskStatus']['status'] == 'RUNNING'
               end
               if result['wTaskStatus']['status'] == 'ERROR'
