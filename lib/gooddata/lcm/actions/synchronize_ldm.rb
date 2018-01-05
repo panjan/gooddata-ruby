@@ -42,17 +42,17 @@ module GoodData
           development_client = params.development_client
 
           synchronize = []
-          params.synchronize.each_slice(100) do |slice|
+          params.synchronize.map do |info|
             to_poll = []
-            synchronize_result = slice.map do |info|
-              from_project = info.from
-              to_projects = info.to
+            from_project = info.from
+            to_projects = info.to
 
-              from = development_client.projects(from_project) || fail("Invalid 'from' project specified - '#{from_project}'")
-              params.gdc_logger.info "Creating Blueprint, project: '#{from.title}', PID: #{from.pid}"
+            from = development_client.projects(from_project) || fail("Invalid 'from' project specified - '#{from_project}'")
+            params.gdc_logger.info "Creating Blueprint, project: '#{from.title}', PID: #{from.pid}"
 
-              blueprint = from.blueprint(include_ca: include_ca)
-              info[:to] = to_projects.pmap do |entry|
+            blueprint = from.blueprint(include_ca: include_ca)
+            to_projects.each_slice(100) do |slice|
+              info[:to] = slice.pmap do |entry|
                 pid = entry[:pid]
                 to_project = client.projects(pid) || fail("Invalid 'to' project specified - '#{pid}'")
 
@@ -68,20 +68,17 @@ module GoodData
                 entry
               end
 
-              info
-            end
-
-            to_poll.each do |polling_uri|
-              result = client.poll_on_response(polling_uri) do |body|
-                body && body['wTaskStatus'] && body['wTaskStatus']['status'] == 'RUNNING'
+              to_poll.each do |polling_uri|
+                result = client.poll_on_response(polling_uri) do |body|
+                  body && body['wTaskStatus'] && body['wTaskStatus']['status'] == 'RUNNING'
+                end
+                if result['wTaskStatus']['status'] == 'ERROR'
+                  fail MaqlExecutionError.new("Executionof MAQL '#{maql}' failed in project '#{pid}'", result)
+                end
+                params.gdc_logger.info("Finished updating blueprint: #{polling_uri}")
               end
-              if result['wTaskStatus']['status'] == 'ERROR'
-                fail MaqlExecutionError.new("Executionof MAQL '#{maql}' failed in project '#{pid}'", result)
-              end
-              params.gdc_logger.info("Finished updating blueprint: #{polling_uri}")
             end
-
-            synchronize.concat(synchronize_result)
+            info
           end
 
           {
