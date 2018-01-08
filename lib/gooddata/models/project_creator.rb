@@ -119,7 +119,7 @@ module GoodData
 
           GoodData.logger.debug("projectModelDiff") { response.pretty_inspect }
           chunks = response['projectModelDiff']['updateScripts']
-          return [] if chunks.empty?
+          return [[], []] if chunks.empty?
 
           ca_maql = response['projectModelDiff']['computedAttributesScript'] if response['projectModelDiff']['computedAttributesScript']
           ca_chunks = ca_maql && ca_maql['maqlDdlChunks']
@@ -157,7 +157,8 @@ module GoodData
               fail "Unable to migrate LDM, reason(s): \n #{messages.join("\n")}"
             end
           end
-          [to_poll, replaced_maqls + (ca_maql ? [ca_maql] : [])]
+          result_maqls = replaced_maqls + (ca_maql ? [ca_maql] : [])
+          [to_poll, result_maqls]
         end
 
         def migrate_reports(project, spec)

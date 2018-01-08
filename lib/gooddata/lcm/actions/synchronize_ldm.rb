@@ -69,6 +69,7 @@ module GoodData
                 entry
               end
 
+              params.gdc_logger.info("Polling #{to_poll.length} maqls.")
               to_poll.each do |polling_uri|
                 result = client.poll_on_response(polling_uri) do |body|
                   body && body['wTaskStatus'] && body['wTaskStatus']['status'] == 'RUNNING'
@@ -78,6 +79,7 @@ module GoodData
                 end
                 params.gdc_logger.info("Finished updating blueprint: #{polling_uri}")
               end
+              params.gdc_logger.info("Finished polling #{to_poll.length} maqls.")
             end
 
             info
