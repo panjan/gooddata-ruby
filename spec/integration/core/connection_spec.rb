@@ -53,4 +53,8 @@ describe GoodData::Rest::Connection do
       c.disconnect
     end
   end
+
+  describe '#connect_sso' do
+    GoodData.connect_sso(ConnectionHelper::DEFAULT_USERNAME, 'pgp')
+  end
 end

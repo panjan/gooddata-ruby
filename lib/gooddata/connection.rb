@@ -119,7 +119,7 @@ module GoodData
         :x_gdc_request => "#{GoodData::Rest::Connection.generate_string}:#{GoodData::Rest::Connection.generate_string}"
       }
 
-      RestClient.get url, params do |response, _request, _result|
+      RestClient.post url, params do |response, _request, _result|
         Rest::Client.connect_sso(:sst_token => URI.decode(response.cookies['GDCAuthSST']))
       end
     end
