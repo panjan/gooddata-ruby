@@ -5,6 +5,8 @@
 # LICENSE file in the root directory of this source tree.
 
 require 'gooddata'
+require 'active_support'
+require 'active_support/core_ext'
 
 describe GoodData::Report, :constraint => 'slow' do
   before(:all) do
@@ -49,6 +51,48 @@ describe GoodData::Report, :constraint => 'slow' do
       @report.export_raw(@filename)
       expect(File).to exist(@filename)
       expect(File.read(@filename)).to eq("\"sum of Lines Changed\"\r\n\"11.00\"\r\n")
+    end
+  end
+
+  describe 'visualization objects' do
+    it 'creates visualization object' do
+      visualization_classes = GoodData::MdObject.query('visualizationClass', GoodData::MdObject, client: @client, project: @project)
+      visualization_class = visualization_classes.first
+      attribute = @project.attributes.first
+      visualization_data =
+      {
+        visualizationObject: {
+          content: {
+            visualizationClass: {
+              uri: visualization_class.uri
+            },
+            buckets: [{
+              localIdentifier: "measure",
+              items: [{
+                measure: {
+                  localIdentifier: "M1",
+                  title: "Count of Account",
+                  format: "#,##0.00",
+                  definition: {
+                    measureDefinition: {
+                      item: {
+                        uri: attribute.uri
+                      },
+                      aggregation: "count"
+                    }
+                  }
+                }
+              }]
+            }]
+          },
+          meta: {}
+        }
+      }
+      v = GoodData::MdObject.new(visualization_data.deep_stringify_keys)
+      v.title = 'Foo'
+      v.project =  @project
+      v.client  = @client
+      v.save
     end
   end
 end
