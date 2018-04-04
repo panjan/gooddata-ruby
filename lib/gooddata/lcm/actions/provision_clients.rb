@@ -30,6 +30,9 @@ module GoodData
 
         description 'Logger'
         param :gdc_logger, instance_of(Type::GdLogger), required: true
+
+        description 'Client projects'
+        param :client_projects, instance_of(Type::GdSmartHashType), required: false
       end
 
       RESULT_HEADER = [
