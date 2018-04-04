@@ -126,9 +126,9 @@ describe GoodData::LCM2::SynchronizeETLsInSegment do
 
       it 'each schedules must have different parameters' do
         schedule1.should_receive(:update_params).once.ordered.with(CLIENT_ID: 'foo', GOODOT_CUSTOM_PROJECT_ID: 'foo')
-        schedule1.should_receive(:update_params).once.ordered.with('HELLO' => 'hi')
+        schedule1.should_receive(:update_params).once.ordered.with(:hello => 'hi')
         schedule2.should_receive(:update_params).once.ordered.with(CLIENT_ID: 'foo', GOODOT_CUSTOM_PROJECT_ID: 'foo')
-        schedule2.should_receive(:update_params).once.ordered.with('BYE' => 'bye')
+        schedule2.should_receive(:update_params).once.ordered.with(:bye => 'bye')
         subject.class.call(params)
       end
     end
@@ -162,9 +162,9 @@ describe GoodData::LCM2::SynchronizeETLsInSegment do
 
       it 'all schedules must have the parameter' do
         schedule1.should_receive(:update_params).once.ordered.with(CLIENT_ID: 'foo', GOODOT_CUSTOM_PROJECT_ID: 'foo')
-        schedule1.should_receive(:update_params).once.ordered.with('HELLO' => 'hi')
+        schedule1.should_receive(:update_params).once.ordered.with(:hello => 'hi')
         schedule2.should_receive(:update_params).once.ordered.with(CLIENT_ID: 'foo', GOODOT_CUSTOM_PROJECT_ID: 'foo')
-        schedule2.should_receive(:update_params).once.ordered.with('HELLO' => 'hi')
+        schedule2.should_receive(:update_params).once.ordered.with(:hello => 'hi')
         subject.class.call(params)
       end
     end
@@ -203,7 +203,7 @@ describe GoodData::LCM2::SynchronizeETLsInSegment do
 
       it 'parameters should be passed to the correct client project and schedule' do
         schedule1.should_receive(:update_params).once.ordered.with(CLIENT_ID: 'foo', GOODOT_CUSTOM_PROJECT_ID: 'foo')
-        schedule1.should_receive(:update_params).once.ordered.with('HELLO' => 'hi')
+        schedule1.should_receive(:update_params).once.ordered.with(:hello => 'hi')
         schedule2.should_receive(:update_params).once.ordered.with(CLIENT_ID: 'foo', GOODOT_CUSTOM_PROJECT_ID: 'foo')
         subject.class.call(params)
       end

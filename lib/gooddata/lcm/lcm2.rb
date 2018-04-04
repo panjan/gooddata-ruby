@@ -15,30 +15,11 @@ module GoodData
     class SmartHash < Hash
       @specification = nil
       def method_missing(name, *_args)
-        key = name.to_s.downcase.to_sym
-
-        value = nil
-        keys.each do |k|
-          if k.to_s.downcase.to_sym == key
-            value = self[k]
-            break
-          end
-        end
-
-        if value
-          value
-        else
-          begin
-            super
-          rescue
-            nil
-          end
-        end
+        data(name)
       end
 
       def [](variable)
-        fail "Param #{variable} is not defined in the specification" if @specification && !@specification[variable] && !@specification[variable.to_sym]
-        super(variable)
+        data(variable)
       end
 
       def clear_filters
@@ -46,7 +27,21 @@ module GoodData
       end
 
       def setup_filters(filter)
-        @specification = filter
+        @specification = filter.to_hash
+      end
+
+      def check_specification(variable)
+        fail "Param #{variable} is not defined in the specification" if @specification && !@specification[variable.to_sym] && !@specification[variable.to_s]
+      end
+
+      def data(variable)
+        check_specification(variable)
+        variable = variable.to_s.downcase.to_sym
+        if keys.include? variable
+          values_at(variable).first
+        elsif keys.include? variable.to_s
+          values_at(variable.to_s).first
+        end
       end
 
       def key?(key)
@@ -184,9 +179,9 @@ module GoodData
           res = SmartHash.new
           params.each_pair do |k, v|
             if v.is_a?(Hash) || v.is_a?(Array)
-              res[k] = convert_to_smart_hash(v)
+              res[k.to_s.downcase.to_sym] = convert_to_smart_hash(v)
             else
-              res[k] = v
+              res[k.to_s.downcase.to_sym] = v
             end
           end
           res
@@ -323,7 +318,7 @@ module GoodData
           # Invoke action
           begin
             GoodData.logger.info("Running #{action.name} action ...")
-
+            params.clear_filters
             # Check if all required parameters were passed
             BaseAction.check_params(action.const_get('PARAMS'), params)
             params.setup_filters(action.const_get('PARAMS'))
