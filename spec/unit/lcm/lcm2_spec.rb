@@ -34,4 +34,22 @@ describe 'GoodData::LCM2' do
       GoodData::LCM2.perform('users', params)
     end
   end
+
+  describe '#convert_to_smart_hash' do
+    subject do
+      GoodData::LCM2.convert_to_smart_hash(hash)
+    end
+
+    context 'when created hash contains key in upper-case' do
+      let(:hash) { { FOO: 'bar' } }
+      it 'fetches value of uppre-case key' do
+        expect(subject.FOO).to eq('bar')
+        expect(subject.foo).to eq('bar')
+        expect(subject['FOO']).to eq('bar')
+        expect(subject['foo']).to eq('bar')
+        expect(subject[:FOO]).to eq('bar')
+        expect(subject[:foo]).to eq('bar')
+      end
+    end
+  end
 end
