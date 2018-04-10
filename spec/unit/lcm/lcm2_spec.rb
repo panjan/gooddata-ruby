@@ -52,6 +52,12 @@ describe 'GoodData::LCM2' do
       GoodData::LCM2.convert_to_smart_hash(hash)
     end
 
+    let(:hash) { { fooBarBaz: 'qUx' } }
+
+    it 'keeps letter case' do
+      expect(subject.to_h).to eq(hash)
+    end
+
     context 'when hash contains symbol key in lower-case' do
       it_behaves_like 'a smart hash' do
         let(:hash) { { foo: 'bar' } }
