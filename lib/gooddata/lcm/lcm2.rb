@@ -36,9 +36,11 @@ module GoodData
 
       def data(variable)
         check_specification(variable)
+        final_value = nil
         keys.each do |k|
-          return values_at(k).first if k.to_s.downcase.to_sym == variable.to_s.downcase.to_sym
+          final_value = values_at(k).first if k.to_s.downcase.to_sym == variable.to_s.downcase.to_sym
         end
+        final_value
       end
 
       def key?(key)
