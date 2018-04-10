@@ -6,6 +6,18 @@
 
 require 'gooddata/lcm/lcm2'
 
+shared_examples 'a smart hash' do
+  let(:expected_value) { 'bar' }
+  it 'fetches value' do
+    expect(subject.FOO).to eq(expected_value)
+    expect(subject.foo).to eq(expected_value)
+    expect(subject['FOO']).to eq(expected_value)
+    expect(subject['foo']).to eq(expected_value)
+    expect(subject[:FOO]).to eq(expected_value)
+    expect(subject[:foo]).to eq(expected_value)
+  end
+end
+
 describe 'GoodData::LCM2' do
   describe '#skip_actions' do
     let(:client) { double(:client) }
@@ -40,15 +52,33 @@ describe 'GoodData::LCM2' do
       GoodData::LCM2.convert_to_smart_hash(hash)
     end
 
-    context 'when created hash contains key in upper-case' do
-      let(:hash) { { FOO: 'bar' } }
-      it 'fetches value of uppre-case key' do
-        expect(subject.FOO).to eq('bar')
-        expect(subject.foo).to eq('bar')
-        expect(subject['FOO']).to eq('bar')
-        expect(subject['foo']).to eq('bar')
-        expect(subject[:FOO]).to eq('bar')
-        expect(subject[:foo]).to eq('bar')
+    let(:hash) { { fooBarBaz: 'qUx' } }
+
+    it 'keeps letter case' do
+      expect(subject.to_h).to eq(hash)
+    end
+
+    context 'when hash contains symbol key in lower-case' do
+      it_behaves_like 'a smart hash' do
+        let(:hash) { { foo: 'bar' } }
+      end
+    end
+
+    context 'when hash contains string key in lower-case' do
+      it_behaves_like 'a smart hash' do
+        let(:hash) { { 'foo' => 'bar' } }
+      end
+    end
+
+    context 'when hash contains symbol key in upper-case' do
+      it_behaves_like 'a smart hash' do
+        let(:hash) { { FOO: 'bar' } }
+      end
+    end
+
+    context 'when hash contains string key in upper-case' do
+      it_behaves_like 'a smart hash' do
+        let(:hash) { { 'FOO' => 'bar' } }
       end
     end
   end
