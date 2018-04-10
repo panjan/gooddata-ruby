@@ -36,11 +36,8 @@ module GoodData
 
       def data(variable)
         check_specification(variable)
-        variable = variable.to_s.downcase.to_sym
-        if keys.include? variable
-          values_at(variable).first
-        elsif keys.include? variable.to_s
-          values_at(variable.to_s).first
+        keys.each do |k|
+          return values_at(k).first if k.to_s.downcase.to_sym == variable.to_s.downcase.to_sym
         end
       end
 
@@ -179,9 +176,9 @@ module GoodData
           res = SmartHash.new
           params.each_pair do |k, v|
             if v.is_a?(Hash) || v.is_a?(Array)
-              res[k.to_s.downcase.to_sym] = convert_to_smart_hash(v)
+              res[k] = convert_to_smart_hash(v)
             else
-              res[k.to_s.downcase.to_sym] = v
+              res[k] = v
             end
           end
           res
