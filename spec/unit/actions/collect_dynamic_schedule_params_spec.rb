@@ -16,40 +16,78 @@ describe GoodData::LCM2::CollectDymanicScheduleParams do
     allow(data_source).to receive(:realize).and_return('spec/data/dynamic_schedule_params_table.csv')
   end
 
-  context 'when dynamic schedule params are passed' do
-    let(:params) do
-      params = {
-        dynamic_params: {
-          input_source: {}
-        }
+  let(:params) do
+    params = {
+      dynamic_params: {
+        input_source: {}
       }
-      GoodData::LCM2.convert_to_smart_hash(params)
-    end
+    }
+    GoodData::LCM2.convert_to_smart_hash(params)
+  end
 
+  context 'when dynamic schedule params are passed' do
     it 'collects them' do
       expected = {
         'client_1' => {
           'rollout' => {
-            'MODE' => 'mode_a'
+            'MODE' => {
+              'value' => 'mode_a',
+              'hidden' => false
+            }
           },
           all_schedules: {
-            'MODE' => 'mode_x'
+            'MODE' => {
+              'value' => 'mode_x',
+              'hidden' => false
+            }
           },
           'release' => {
-            'MODE' => 'mode_c'
+            'MODE' => {
+              'value' => 'mode_c',
+              'hidden' => false
+            }
           }
         },
         'client_2' => {
           'provisioning' => {
-            'MODE' => 'mode_b'
+            'MODE' => {
+              'value' => 'mode_b',
+              'hidden' => false
+            }
           }
         },
         all_clients: {
           all_schedules: {
-            'MODE' => 'mode_all'
+            'MODE' => {
+              'value' => 'mode_all',
+              'hidden' => false
+            }
           }
         }
       }
+      expect(subject[:params][:schedule_params]).to eq(expected)
+    end
+  end
+
+  context 'when input contains hidden parameter' do
+    before do
+      allow(data_source).to receive(:realize).and_return('spec/data/dynamic_schedule_hidden_params_table.csv')
+    end
+
+    let(:expected) do
+      {
+        'client_1' => {
+          'my_schedule' => {
+            'big_secret' => {
+              'value' => 'melon_is_vegetable',
+              'hidden' => true
+            }
+          }
+        }
+      }
+    end
+
+    it 'sets hidden to true' do
       expect(subject[:params][:schedule_params]).to eq(expected)
     end
   end

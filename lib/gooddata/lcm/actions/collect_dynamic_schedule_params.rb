@@ -36,6 +36,7 @@ module GoodData
           client_id_column = params.client_id_column || 'client_id'
           param_name_column = params.param_name_column || 'param_name'
           param_value_column = params.param_value_column || 'param_value'
+          hidden_column = 'hidden'
           results = []
 
           input_source = params.dynamic_params.input_source
@@ -56,8 +57,13 @@ module GoodData
 
             schedule_params[client_id] ||= {}
             schedule_params[client_id][schedule_name] ||= {}
-
-            schedule_params[client_id][schedule_name].merge!(row[param_name_column] => row[param_value_column])
+            param = {
+              row[param_name_column] => {
+                'value' => row[param_value_column],
+                'hidden' => row[hidden_column].to_b
+              }
+            }
+            schedule_params[client_id][schedule_name].merge!(param)
           end
 
           {
