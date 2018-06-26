@@ -9,6 +9,7 @@ require 'gooddata/lcm/lcm2'
 
 describe GoodData::LCM2::CollectDymanicScheduleParams do
   let(:data_source) { double(:data_source) }
+  subject { GoodData::LCM2.run_action(GoodData::LCM2::CollectDymanicScheduleParams, params) }
 
   before do
     allow(GoodData::Helpers::DataSource).to receive(:new).and_return(data_source)
@@ -26,7 +27,6 @@ describe GoodData::LCM2::CollectDymanicScheduleParams do
     end
 
     it 'collects them' do
-      result = subject.class.call(params)
       expected = {
         'client_1' => {
           'rollout' => {
@@ -50,7 +50,7 @@ describe GoodData::LCM2::CollectDymanicScheduleParams do
           }
         }
       }
-      expect(result[:params][:schedule_params]).to eq(expected)
+      expect(subject[:params][:schedule_params]).to eq(expected)
     end
   end
 end
