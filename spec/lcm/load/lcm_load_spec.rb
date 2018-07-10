@@ -31,6 +31,13 @@ describe 'LCM load test' do
   end
 
   describe 'release' do
+    before(:all) do
+      @config_template_path = File.expand_path(
+        '../../integration/params/release_brick.json.erb',
+        __FILE__
+      )
+    end
+
     include_context 'release brick'
     after(:all) do
       @release_time = Time.now - @start_time
@@ -40,6 +47,13 @@ describe 'LCM load test' do
   end
 
   describe 'provisioning' do
+    before(:all) do
+      @config_template_path = File.expand_path(
+        '../../integration/params/provisioning_brick.json.erb',
+        __FILE__
+      )
+    end
+
     include_context 'provisioning brick'
     after(:all) do
       @provisioning_time = Time.now - @start_time
@@ -48,6 +62,12 @@ describe 'LCM load test' do
   end
 
   describe 'rollout' do
+    before(:all) do
+      @config_template_path = File.expand_path(
+        '../../integration/params/rollout_brick.json.erb',
+        __FILE__
+      )
+    end
     include_context 'rollout brick'
     after(:all) do
       @rollout_time = Time.now - @start_time
