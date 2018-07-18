@@ -15,7 +15,7 @@ module GoodData
       class << self
         # Get path of .gooddata config
         def credentials_file
-          "#{Helpers.home_directory}/.gooddata"
+          GoodData::Helpers.find_goodfile
         end
 
         # Read credentials
