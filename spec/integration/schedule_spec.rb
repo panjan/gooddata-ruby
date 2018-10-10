@@ -7,7 +7,7 @@
 require 'gooddata/models/schedule'
 require 'gooddata/helpers/global_helpers'
 
-describe GoodData::Schedule do
+describe GoodData::Schedule, :vcr, :vcr_all_cassette do
   before(:all) do
     @client = ConnectionHelper.create_default_connection
     SCHEDULE_ID = ProjectHelper.schedule_id(@client)
