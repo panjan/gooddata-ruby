@@ -2,11 +2,11 @@ language: ruby
 cache: bundler
 stages:
 - name: unit
-  if: type IN (push, pull_request)
+  if: type IN (pull_request)
 - name: integration
-  if: type IN (api)
+  if: type IN (pull_request)
 - name: periodic
-  if: type IN (cron)
+  if: type IN (push)
 jobs:
   include:
   # unit
@@ -31,7 +31,8 @@ jobs:
     script: VCR_RECORD_MODE=none bundle exec rake test:project
     rvm: jruby-9.1.7
   # integration
-  - stage: integration
+  - &lcm-integration-tests
+    stage: integration
     name: lcm integration tests
     script: |
       bundle exec rake -f lcm.rake docker:build
@@ -41,37 +42,15 @@ jobs:
     - jruby-9.1.7
   - stage: integration
     name: sdk integration tests
-    script: VCR_ON=false bundle exec rake test:sdk
+    script: bundle exec rake test:sdk
     rvm: jruby-9.1.7
+    env: VCR_ON=false
   - stage: integration
     name: sdk integration tests (project)
-    script: VCR_ON=false bundle exec rake test:project
+    script: bundle exec rake test:project
+    env: VCR_ON=false
     rvm: jruby-9.1.7
   # periodic
-  - stage: periodic
-    name: lcm integration tests
-    script: |
-      bundle exec rake -f lcm.rake docker:build
-      bundle exec rake -f lcm.rake docker:bundle
-      VCR_ON=false bundle exec rake -f lcm.rake test:integration:docker
-    rvm: jruby-9.1.7
-    env:
-    - GD_ENV=development
-    - GD_ENV=testing
-    - GD_ENV=staging
-  - stage: periodic
-    name: sdk integration tests
-    script: VCR_ON=false bundle exec rake test:sdk
-    rvm: jruby-9.1.7
-    env:
-    - GD_ENV=development
-    - GD_ENV=testing
-    - GD_ENV=staging
-  - stage: periodic
-    name: sdk integration tests (project)
-    script: VCR_ON=false bundle exec rake test:project
-    rvm: jruby-9.1.7
-    env:
-    - GD_ENV=development
-    - GD_ENV=testing
-    - GD_ENV=staging
+  - <<: *lcm-integration-tests
+    name: lcm integration tests (staging 3)
+    env: GD_ENV=development
