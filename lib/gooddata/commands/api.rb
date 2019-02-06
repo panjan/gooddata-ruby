@@ -37,9 +37,10 @@ module GoodData
 
         # Get resource
         # @param path Resource path
-        def get(path)
+        def get(path, opts)
           fail(GoodData::CommandFailed, 'Specify the path you want to GET.') if path.nil?
-          result = GoodData.get path
+          client = GoodData.connect(opts)
+          result = client.get path
           begin
             result
           rescue
