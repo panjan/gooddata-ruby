@@ -4,6 +4,7 @@ require_relative '../integration/support/configuration_helper'
 require_relative '../integration/support/s3_helper'
 
 file_name = nil
+original_node_name = ENV['NODE_NAME']
 
 describe GoodData::SplunkLoggerDecorator do
   before(:all) do
@@ -24,9 +25,11 @@ describe GoodData::SplunkLoggerDecorator do
   context 'when splunk logging is switched on' do
     before do
       file_name = "splunk_#{GoodData::Environment::RANDOM_STRING}.log"
+      ENV['NODE_NAME'] = 'i_am_node_name'
     end
 
     after(:all) do
+      ENV['NODE_NAME'] = original_node_name
       File.delete file_name if File.exist? file_name
     end
 

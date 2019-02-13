@@ -5,8 +5,9 @@
 # LICENSE file in the root directory of this source tree.
 
 require 'logger'
-require 'gooddata/core/splunk_logger_decorator'
+require 'remote_syslog_logger'
 
+require 'gooddata/core/splunk_logger_decorator'
 require 'gooddata/extensions/true'
 require 'gooddata/extensions/false'
 require 'gooddata/extensions/integer'
