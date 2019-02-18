@@ -35,7 +35,8 @@ namespace :gem do
     gem = "gooddata-#{GoodData::VERSION}.gem"
 
     puts "Building #{gem} ..."
-    res = `gem build ./gooddata.gemspec`
+    res = system('gem build ./gooddata.gemspec')
+    require 'pry';binding.pry
     file = res.match('File: (.*)')[1]
     next unless file
 

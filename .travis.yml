@@ -1,8 +1,8 @@
 language: ruby
 cache: bundler
 stages:
-- name: before-merge
-  if: type IN (push, pull_request)
+# - name: before-merge
+#   if: type IN (push, pull_request)
 - name: after-merge
   if: type IN (api, cron)
 - name: platform-cleanup
@@ -16,46 +16,46 @@ git:
 jobs:
   include:
   # BEFORE MERGE
-  - name: pronto code review
-    stage: before-merge
-    script: |
-      git remote add upstream https://github.com/gooddata/gooddata-ruby.git
-      git fetch upstream master
-      bundle exec pronto run -c upstream/master --exit-code
-
-  - name: unit tests
-    stage: before-merge
-    script: bundle exec rake test:unit
-    rvm:
-    - 2.2
-    - 2.3
-    - 2.4
-    - 2.5
-    - jruby-1.7.19
-    - jruby-9.1.5
-    - jruby-9.1.7
-    - jruby-9.1.14
-
-  - name: sdk integration (vcr) tests - base
-    stage: before-merge
-    script: bundle exec rake test:sdk
-    env: VCR_RECORD_MODE=none
-    rvm: 2.3
-
-  - name: sdk integration (vcr) tests - project
-    stage: before-merge
-    script: bundle exec rake test:project
-    env: VCR_RECORD_MODE=none
-    rvm: 2.3
-
-  - name: lcm integration (vcr) tests - e2e
-    stage: before-merge
-    script: bundle exec rspec spec/lcm/integration/lcm_end_to_end_spec.rb
-    env:
-    - VCR_RECORD_MODE=none
-    - GD_ENV=development
-    rvm: 2.3
-
+  # - name: pronto code review
+  #   stage: before-merge
+  #   script: |
+  #     git remote add upstream https://github.com/gooddata/gooddata-ruby.git
+  #     git fetch upstream master
+  #     bundle exec pronto run -c upstream/master --exit-code
+  #
+  # - name: unit tests
+  #   stage: before-merge
+  #   script: bundle exec rake test:unit
+  #   rvm:
+  #   - 2.2
+  #   - 2.3
+  #   - 2.4
+  #   - 2.5
+  #   - jruby-1.7.19
+  #   - jruby-9.1.5
+  #   - jruby-9.1.7
+  #   - jruby-9.1.14
+  #
+  # - name: sdk integration (vcr) tests - base
+  #   stage: before-merge
+  #   script: bundle exec rake test:sdk
+  #   env: VCR_RECORD_MODE=none
+  #   rvm: 2.3
+  #
+  # - name: sdk integration (vcr) tests - project
+  #   stage: before-merge
+  #   script: bundle exec rake test:project
+  #   env: VCR_RECORD_MODE=none
+  #   rvm: 2.3
+  #
+  # - name: lcm integration (vcr) tests - e2e
+  #   stage: before-merge
+  #   script: bundle exec rspec spec/lcm/integration/lcm_end_to_end_spec.rb
+  #   env:
+  #   - VCR_RECORD_MODE=none
+  #   - GD_ENV=development
+  #   rvm: 2.3
+  # 
   #  AFTER MERGE
   #  staging 1
   - &lcm-integration-tests
@@ -198,12 +198,12 @@ jobs:
       gem: gooddata
       api_key: $RUBYGEMS_API_KEY
   - stage: gem-release
-    name: deploy JRuby gem
+    name: deploy MRI gem
     rvm: jruby-9.1.14
-    script: |
-      echo -e "---\n:rubygems_api_key: $RUBYGEMS_API_KEY" > ~/.gem/credentials
-      chmod 0600 ~/.gem/credentials
-      bundle exec rake gem:release
+    deploy:
+      provider: rubygems
+      gem: gooddata
+      api_key: $RUBYGEMS_API_KEY
 
 notifications:
   email:
